@@ -4,6 +4,7 @@ import 'package:flame/components.dart';
 import 'package:flame_tiled/flame_tiled.dart';
 import 'package:pixel_adventure/components/background_tile.dart';
 import 'package:pixel_adventure/components/checkpoint.dart';
+import 'package:pixel_adventure/components/chicken.dart';
 import 'package:pixel_adventure/components/collison_block.dart';
 import 'package:pixel_adventure/components/fruit.dart';
 import 'package:pixel_adventure/components/player.dart';
@@ -39,26 +40,20 @@ class Level extends World with HasGameRef<PixelAdventure> {
 
   void _scrollingBackground() {
     final backgroundLayer = level.tileMap.getLayer<TileLayer>('background');
-    const tileSize = 64;
 
-    final numTilesY = (game.size.y / tileSize).floor();
-    final numTilesX = (game.size.x / tileSize).floor();
     if (backgroundLayer != null) {
       final backgroundColor =
           backgroundLayer.properties.getValue('background_color');
 
-      for (double y = 0; y < game.size.y / numTilesY; y++) {
-        for (double x = 0; x < numTilesX; x++) {
-          final backgroundTile = BackgroundTile(
-            color: backgroundColor ?? 'Gray',
-            position: Vector2(
-              x * tileSize,
-              y * tileSize - tileSize,
-            ),
-          );
-          add(backgroundTile);
-        }
-      }
+      final backgroundTile = BackgroundTile(
+        color: backgroundColor ?? 'Gray',
+        position: Vector2(
+          0,
+          0,
+        ),
+      );
+
+      add(backgroundTile);
     }
   }
 
@@ -72,6 +67,7 @@ class Level extends World with HasGameRef<PixelAdventure> {
               spawnPoint.x,
               spawnPoint.y,
             );
+            player.scale.x = 1;
             add(player);
             break;
           case 'Fruit':
@@ -119,6 +115,23 @@ class Level extends World with HasGameRef<PixelAdventure> {
               ),
             );
             add(checkpoint);
+            break;
+          case 'Chicken':
+            final offNeg = spawnPoint.properties.getValue('offNeg');
+            final offPos = spawnPoint.properties.getValue('offPos');
+            final chicken = Chicken(
+              position: Vector2(
+                spawnPoint.x,
+                spawnPoint.y,
+              ),
+              size: Vector2(
+                spawnPoint.width,
+                spawnPoint.height,
+              ),
+              offNeg: offNeg,
+              offPos: offPos,
+            );
+            add(chicken);
             break;
           default:
         }

@@ -4,22 +4,29 @@ import 'package:flame/components.dart';
 import 'package:flame/events.dart';
 import 'package:flame/game.dart';
 import 'package:flutter/widgets.dart';
+import 'package:pixel_adventure/components/jump_button.dart';
 import 'package:pixel_adventure/components/level.dart';
 
 import 'components/player.dart';
 
 class PixelAdventure extends FlameGame
-    with HasKeyboardHandlerComponents, DragCallbacks, HasCollisionDetection {
+    with
+        HasKeyboardHandlerComponents,
+        DragCallbacks,
+        HasCollisionDetection,
+        TapCallbacks {
   @override
   Color backgroundColor() => const Color(0xFF211F30);
 
   late CameraComponent cam;
   Player player = Player(character: 'Mask Dude');
   late JoystickComponent joystick;
-  bool showJoystick = true;
+  bool showControls = true;
+  bool playSounds = true;
+  double soundVolume = 1.0;
   List<String> levelNames = [
     'level_01',
-    'level_02',
+    'level_01',
   ];
   int currentLevelIndex = 0;
 
@@ -30,8 +37,9 @@ class PixelAdventure extends FlameGame
 
     _loadLevel();
 
-    if (showJoystick) {
+    if (showControls) {
       addJoystick();
+      add(JumpButton());
     }
 
     return super.onLoad();
@@ -39,7 +47,7 @@ class PixelAdventure extends FlameGame
 
   @override
   void update(double dt) {
-    if (showJoystick) {
+    if (showControls) {
       updateJoystick();
     }
 
@@ -48,6 +56,7 @@ class PixelAdventure extends FlameGame
 
   void addJoystick() {
     joystick = JoystickComponent(
+      priority: 10,
       knob: SpriteComponent(
         sprite: Sprite(
           images.fromCache('HUD/Knob.png'),
@@ -88,7 +97,8 @@ class PixelAdventure extends FlameGame
       currentLevelIndex++;
       _loadLevel();
     } else {
-      // no more levels
+      currentLevelIndex = 0;
+      _loadLevel();
     }
   }
 
@@ -102,6 +112,7 @@ class PixelAdventure extends FlameGame
         width: 640,
         height: 360,
       );
+      cam.priority = -1;
       cam.viewfinder.anchor = Anchor.topLeft;
 
       addAll([cam, world]);
